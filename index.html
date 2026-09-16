@@ -1796,7 +1796,302 @@ footer {
 
 
 <!-- =========================================================
+
+<!-- =========================================================
+     JOBS SECTION
+========================================================= -->
+
+<section id="jobsSection" style="padding: 0 0 50px;">
+
+    <div class="section-title">
+        <div>
+            <h2>Latest Jobs</h2>
+            <p>Browse published jobs and local employment opportunities.</p>
+        </div>
+    </div>
+
+    <div id="jobsArea">
+        <div class="loading">
+            <div class="spinner"></div>
+            <p>Loading jobs...</p>
+        </div>
+    </div>
+
+</section>
+
+
+<script>
+/* =========================================================
+   HOME JOBS - DATE GROUPING
+========================================================= */
+
+async function loadHomeJobs() {
+
+    const area = document.getElementById("jobsArea");
+    if (!area || !db) return;
+
+    area.innerHTML = `
+        <div class="loading">
+            <div class="spinner"></div>
+            <p>Loading jobs...</p>
+        </div>
+    `;
+
+    try {
+
+        const { data, error } = await db
+            .from("jobs")
+            .select("*")
+            .eq("status", "published")
+            .order("created_at", { ascending: false });
+
+        if (error) throw error;
+
+        renderHomeJobs(data || []);
+
+    } catch (error) {
+
+        console.error("Home jobs loading error:", error);
+
+        area.innerHTML = `
+            <div class="empty">
+                <div class="empty-icon">💼</div>
+                <h3>Could not load jobs</h3>
+                <p>Please try again later.</p>
+            </div>
+        `;
+    }
+}
+
+
+function getHomeJobDateGroup(dateValue) {
+
+    const date = new Date(dateValue);
+
+    if (isNaN(date.getTime())) return "older";
+
+    const now = new Date();
+
+    const startToday = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate()
+    );
+
+    const jobDay = new Date(
+        date.getFullYear(),
+        date.getMonth(),
+        date.getDate()
+    );
+
+    const diffDays = Math.floor(
+        (startToday - jobDay) / 86400000
+    );
+
+    if (diffDays === 0) return "today";
+    if (diffDays === 1) return "yesterday";
+    if (diffDays === 2) return "day2";
+    if (diffDays === 3) return "day3";
+    if (diffDays === 4) return "day4";
+    if (diffDays === 5) return "day5";
+    if (diffDays === 6) return "day6";
+    if (diffDays === 7) return "week";
+
+    return "older";
+}
+
+
+function renderHomeJobCard(job) {
+
+    const title = job.title || "Job Opportunity";
+    const company = job.company_name || "Employer";
+    const category = job.category || "";
+    const salary = job.salary || "";
+    const location =
+        job.location ||
+        job.city ||
+        job.town ||
+        "";
+
+    const description =
+        String(job.description || "");
+
+    const shortDescription =
+        description.length > 180
+            ? description.substring(0, 180) + "..."
+            : description;
+
+    const id = encodeURIComponent(job.id || "");
+
+    return `
+        <article class="job-card">
+
+            <h3>${escapeHTML(title)}</h3>
+
+            <div class="job-company">
+                🏢 ${escapeHTML(company)}
+            </div>
+
+            <div class="job-meta">
+
+                ${
+                    category
+                    ? `
+                    <span class="chip">
+                        📂 ${escapeHTML(category)}
+                    </span>
+                    `
+                    : ""
+                }
+
+                ${
+                    job.job_type
+                    ? `
+                    <span class="chip">
+                        💼 ${escapeHTML(String(job.job_type))}
+                    </span>
+                    `
+                    : ""
+                }
+
+                ${
+                    salary
+                    ? `
+                    <span class="chip">
+                        💰 ${escapeHTML(String(salary))}
+                    </span>
+                    `
+                    : ""
+                }
+
+            </div>
+
+            ${
+                location
+                ? `
+                <div class="job-location">
+                    📍 ${escapeHTML(String(location))}
+                </div>
+                `
+                : ""
+            }
+
+            <div class="job-description">
+                ${escapeHTML(shortDescription)}
+            </div>
+
+            <div class="job-actions">
+                <button
+                    class="btn btn-primary btn-small"
+                    type="button"
+                    onclick="viewHomeJob('${id}')"
+                >
+                    View Job
+                </button>
+            </div>
+
+        </article>
+    `;
+}
+
+
+function viewHomeJob(encodedId) {
+
+    const id = decodeURIComponent(encodedId || "");
+
+    if (!id) return;
+
+    window.location.href =
+        "job-details.html?id=" +
+        encodeURIComponent(id);
+}
+
+
+function renderHomeJobs(jobs) {
+
+    const area = document.getElementById("jobsArea");
+
+    if (!area) return;
+
+    if (!jobs || jobs.length === 0) {
+
+        area.innerHTML = `
+            <div class="empty">
+                <div class="empty-icon">💼</div>
+                <h3>No Jobs Found</h3>
+                <p>There are no published jobs yet.</p>
+            </div>
+        `;
+
+        return;
+    }
+
+    const grouped = {
+        today: [],
+        yesterday: [],
+        day2: [],
+        day3: [],
+        day4: [],
+        day5: [],
+        day6: [],
+        week: [],
+        older: []
+    };
+
+    jobs.forEach(function(job) {
+
+        const group =
+            getHomeJobDateGroup(job.created_at);
+
+        grouped[group].push(job);
+
+    });
+
+    const groups = [
+        { key: "today", label: "Today Jobs" },
+        { key: "yesterday", label: "Yesterday Jobs" },
+        { key: "day2", label: "Before 2 Days Jobs" },
+        { key: "day3", label: "Before 3 Days Jobs" },
+        { key: "day4", label: "Before 4 Days Jobs" },
+        { key: "day5", label: "Before 5 Days Jobs" },
+        { key: "day6", label: "Before 6 Days Jobs" },
+        { key: "week", label: "Before Week Jobs" },
+        { key: "older", label: "Older Jobs" }
+    ];
+
+    let output = "";
+
+    groups.forEach(function(group) {
+
+        const items = grouped[group.key];
+
+        if (!items.length) return;
+
+        output += `
+            <div class="property-date-section">
+
+                <div class="property-date-heading">
+                    <h2>${group.label}</h2>
+                    <span>
+                        ${items.length}
+                        ${items.length === 1 ? "Job" : "Jobs"}
+                    </span>
+                </div>
+
+                <div class="property-grid">
+                    ${items.map(renderHomeJobCard).join("")}
+                </div>
+
+            </div>
+        `;
+    });
+
+    area.innerHTML = output;
+}
+</script>
+
      LOGIN MODAL
+    await loadHomeJobs();
 ========================================================= -->
 
 <div
