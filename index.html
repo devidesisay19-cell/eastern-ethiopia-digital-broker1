@@ -1368,6 +1368,20 @@ footer {
     }
 }
 
+.quick-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin:28px 0;}
+.quick-action-card{display:block;text-decoration:none;}
+@media(max-width:600px){.quick-actions{grid-template-columns:1fr;}}
+.home-jobs-section{margin:40px 0;padding:24px 0;}
+.home-job-date-section{margin:28px 0 36px;}
+.home-job-date-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;padding:14px 16px;border-radius:14px;background:#ecfdf5;border:1px solid #99f6e4;}
+.home-job-date-heading h3{margin:0;font-size:20px;}
+.home-job-date-heading span{font-size:13px;font-weight:700;padding:6px 10px;border-radius:999px;background:#fff;}
+.home-jobs-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;}
+.home-job-card{padding:20px;border-radius:16px;background:#fff;border:1px solid #e5e7eb;box-shadow:0 4px 14px rgba(0,0,0,.06);}
+.home-job-card h3{margin:0 0 8px;font-size:19px;}
+.home-job-card strong{display:block;margin-bottom:10px;}
+.home-job-card p{margin:10px 0;line-height:1.6;}
+@media(max-width:600px){.home-job-date-heading h3{font-size:18px;}.home-jobs-grid{grid-template-columns:1fr;}}
 </style>
 
 </head>
@@ -1792,306 +1806,41 @@ footer {
 
     </div>
 
+
+    <div class="quick-actions">
+        <a class="quick-action-card" href="#propertiesSection">
+            <div class="quick-action-icon">🏠</div>
+            <div class="quick-action-title">Property Listing</div>
+            <div class="quick-action-text">Browse available properties</div>
+        </a>
+        <a class="quick-action-card" href="#jobsSection">
+            <div class="quick-action-icon">💼</div>
+            <div class="quick-action-title">Latest Jobs</div>
+            <div class="quick-action-text">View the latest job opportunities</div>
+        </a>
+    </div>
+
+
+    <section id="jobsSection" class="home-jobs-section">
+        <div class="section-title">
+            <div>
+                <h2>Latest Jobs</h2>
+                <p>Latest published job opportunities.</p>
+            </div>
+        </div>
+
+        <div id="homeJobsArea">
+            <div class="loading">
+                <div class="spinner"></div>
+                <p>Loading jobs...</p>
+            </div>
+        </div>
+    </section>
+
 </main>
 
 
-<!-- =========================================================
-
-<!-- =========================================================
-     JOBS SECTION
-========================================================= -->
-
-<section id="jobsSection" style="padding: 0 0 50px;">
-
-    <div class="section-title">
-        <div>
-            <h2>Latest Jobs</h2>
-            <p>Browse published jobs and local employment opportunities.</p>
-        </div>
-    </div>
-
-    <div id="jobsArea">
-        <div class="loading">
-            <div class="spinner"></div>
-            <p>Loading jobs...</p>
-        </div>
-    </div>
-
-</section>
-
-
-<script>
-/* =========================================================
-   HOME JOBS - DATE GROUPING
-========================================================= */
-
-async function loadHomeJobs() {
-
-    const area = document.getElementById("jobsArea");
-    if (!area || !db) return;
-
-    area.innerHTML = `
-        <div class="loading">
-            <div class="spinner"></div>
-            <p>Loading jobs...</p>
-        </div>
-    `;
-
-    try {
-
-        const { data, error } = await db
-            .from("jobs")
-            .select("*")
-            .eq("status", "published")
-            .order("created_at", { ascending: false });
-
-        if (error) throw error;
-
-        renderHomeJobs(data || []);
-
-    } catch (error) {
-
-        console.error("Home jobs loading error:", error);
-
-        area.innerHTML = `
-            <div class="empty">
-                <div class="empty-icon">💼</div>
-                <h3>Could not load jobs</h3>
-                <p>Please try again later.</p>
-            </div>
-        `;
-    }
-}
-
-
-function getHomeJobDateGroup(dateValue) {
-
-    const date = new Date(dateValue);
-
-    if (isNaN(date.getTime())) return "older";
-
-    const now = new Date();
-
-    const startToday = new Date(
-        now.getFullYear(),
-        now.getMonth(),
-        now.getDate()
-    );
-
-    const jobDay = new Date(
-        date.getFullYear(),
-        date.getMonth(),
-        date.getDate()
-    );
-
-    const diffDays = Math.floor(
-        (startToday - jobDay) / 86400000
-    );
-
-    if (diffDays === 0) return "today";
-    if (diffDays === 1) return "yesterday";
-    if (diffDays === 2) return "day2";
-    if (diffDays === 3) return "day3";
-    if (diffDays === 4) return "day4";
-    if (diffDays === 5) return "day5";
-    if (diffDays === 6) return "day6";
-    if (diffDays === 7) return "week";
-
-    return "older";
-}
-
-
-function renderHomeJobCard(job) {
-
-    const title = job.title || "Job Opportunity";
-    const company = job.company_name || "Employer";
-    const category = job.category || "";
-    const salary = job.salary || "";
-    const location =
-        job.location ||
-        job.city ||
-        job.town ||
-        "";
-
-    const description =
-        String(job.description || "");
-
-    const shortDescription =
-        description.length > 180
-            ? description.substring(0, 180) + "..."
-            : description;
-
-    const id = encodeURIComponent(job.id || "");
-
-    return `
-        <article class="job-card">
-
-            <h3>${escapeHTML(title)}</h3>
-
-            <div class="job-company">
-                🏢 ${escapeHTML(company)}
-            </div>
-
-            <div class="job-meta">
-
-                ${
-                    category
-                    ? `
-                    <span class="chip">
-                        📂 ${escapeHTML(category)}
-                    </span>
-                    `
-                    : ""
-                }
-
-                ${
-                    job.job_type
-                    ? `
-                    <span class="chip">
-                        💼 ${escapeHTML(String(job.job_type))}
-                    </span>
-                    `
-                    : ""
-                }
-
-                ${
-                    salary
-                    ? `
-                    <span class="chip">
-                        💰 ${escapeHTML(String(salary))}
-                    </span>
-                    `
-                    : ""
-                }
-
-            </div>
-
-            ${
-                location
-                ? `
-                <div class="job-location">
-                    📍 ${escapeHTML(String(location))}
-                </div>
-                `
-                : ""
-            }
-
-            <div class="job-description">
-                ${escapeHTML(shortDescription)}
-            </div>
-
-            <div class="job-actions">
-                <button
-                    class="btn btn-primary btn-small"
-                    type="button"
-                    onclick="viewHomeJob('${id}')"
-                >
-                    View Job
-                </button>
-            </div>
-
-        </article>
-    `;
-}
-
-
-function viewHomeJob(encodedId) {
-
-    const id = decodeURIComponent(encodedId || "");
-
-    if (!id) return;
-
-    window.location.href =
-        "job-details.html?id=" +
-        encodeURIComponent(id);
-}
-
-
-function renderHomeJobs(jobs) {
-
-    const area = document.getElementById("jobsArea");
-
-    if (!area) return;
-
-    if (!jobs || jobs.length === 0) {
-
-        area.innerHTML = `
-            <div class="empty">
-                <div class="empty-icon">💼</div>
-                <h3>No Jobs Found</h3>
-                <p>There are no published jobs yet.</p>
-            </div>
-        `;
-
-        return;
-    }
-
-    const grouped = {
-        today: [],
-        yesterday: [],
-        day2: [],
-        day3: [],
-        day4: [],
-        day5: [],
-        day6: [],
-        week: [],
-        older: []
-    };
-
-    jobs.forEach(function(job) {
-
-        const group =
-            getHomeJobDateGroup(job.created_at);
-
-        grouped[group].push(job);
-
-    });
-
-    const groups = [
-        { key: "today", label: "Today Jobs" },
-        { key: "yesterday", label: "Yesterday Jobs" },
-        { key: "day2", label: "Before 2 Days Jobs" },
-        { key: "day3", label: "Before 3 Days Jobs" },
-        { key: "day4", label: "Before 4 Days Jobs" },
-        { key: "day5", label: "Before 5 Days Jobs" },
-        { key: "day6", label: "Before 6 Days Jobs" },
-        { key: "week", label: "Before Week Jobs" },
-        { key: "older", label: "Older Jobs" }
-    ];
-
-    let output = "";
-
-    groups.forEach(function(group) {
-
-        const items = grouped[group.key];
-
-        if (!items.length) return;
-
-        output += `
-            <div class="property-date-section">
-
-                <div class="property-date-heading">
-                    <h2>${group.label}</h2>
-                    <span>
-                        ${items.length}
-                        ${items.length === 1 ? "Job" : "Jobs"}
-                    </span>
-                </div>
-
-                <div class="property-grid">
-                    ${items.map(renderHomeJobCard).join("")}
-                </div>
-
-            </div>
-        `;
-    });
-
-    area.innerHTML = output;
-}
-</script>
-
      LOGIN MODAL
-    await loadHomeJobs();
 ========================================================= -->
 
 <div
@@ -5941,6 +5690,7 @@ async function initializeApp() {
      */
 
     await loadProperties();
+    await loadHomeJobs();
 
 
     console.log(
@@ -6036,4 +5786,7 @@ document.addEventListener(
         padding: 6px 9px;
     }
 }
+.quick-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin:28px 0;}
+.quick-action-card{display:block;text-decoration:none;}
+@media(max-width:600px){.quick-actions{grid-template-columns:1fr;}}
 </style>
