@@ -4826,84 +4826,145 @@ function normalizePropertyType(
    RENDER PROPERTIES
 ========================================================= */
 
-function renderProperties(
-    properties
-) {
+function renderProperties(properties) {
 
-    const area =
-        document.getElementById(
-            "propertyArea"
-        );
+    const area = document.getElementById("propertyArea");
 
+    if (!area) return;
 
-    if (!area) {
-
+    if (!properties || properties.length === 0) {
+        area.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-state-icon">🏠</div>
+                <h3>No Properties Found</h3>
+                <p>Try changing your search or filters.</p>
+            </div>
+        `;
         return;
     }
 
+    const groups = [
+        { label: "Today Property", days: 0 },
+        { label: "Yesterday Property", days: 1 },
+        { label: "Before 2 Days Property", days: 2 },
+        { label: "Before 3 Days Property", days: 3 },
+        { label: "Before 4 Days Property", days: 4 },
+        { label: "Before 5 Days Property", days: 5 },
+        { label: "Before 6 Days Property", days: 6 },
+        { label: "Before Week Property", days: 7 }
+    ];
 
-    if (
-        !properties ||
-        properties.length === 0
-    ) {
+    const now = new Date();
+    const today = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate()
+    );
 
-        area.innerHTML = `
+    const getDayDifference = function(property) {
+        if (!property.created_at) return 9999;
 
-            <div class="empty-state">
+        const created = new Date(property.created_at);
 
-                <div class="empty-state-icon">
-                    🏠
-                </div>
+        if (isNaN(created.getTime())) return 9999;
 
-                <h3>
-                    No Properties Found
-                </h3>
+        const createdDay = new Date(
+            created.getFullYear(),
+            created.getMonth(),
+            created.getDate()
+        );
 
-                <p>
-                    Try changing your search or filters.
-                </p>
+        return Math.floor(
+            (today - createdDay) / (1000 * 60 * 60 * 24)
+        );
+    };
 
+    const grouped = {};
+    groups.forEach(function(group) {
+        grouped[group.days] = [];
+    });
+
+    grouped.older = [];
+
+    properties.forEach(function(property) {
+        const diff = getDayDifference(property);
+
+        if (grouped[diff] !== undefined) {
+            grouped[diff].push(property);
+        } else {
+            grouped.older.push(property);
+        }
+    });
+
+    area.innerHTML = "";
+
+    let shownGroups = 0;
+
+    groups.forEach(function(group) {
+
+        const items = grouped[group.days];
+
+        if (!items || items.length === 0) return;
+
+        const section = document.createElement("section");
+        section.className = "property-date-section";
+
+        section.innerHTML = `
+            <div class="property-date-heading">
+                <h2>${group.label}</h2>
+                <span>${items.length} ${items.length === 1 ? "Property" : "Properties"}</span>
             </div>
-
         `;
 
-        return;
+        const grid = document.createElement("div");
+        grid.className = "property-grid";
+
+        items.forEach(function(property) {
+            const card = createPropertyCard(property);
+            grid.appendChild(card);
+        });
+
+        section.appendChild(grid);
+        area.appendChild(section);
+
+        shownGroups++;
+    });
+
+    if (grouped.older.length > 0) {
+
+        const section = document.createElement("section");
+        section.className = "property-date-section";
+
+        section.innerHTML = `
+            <div class="property-date-heading">
+                <h2>Older Properties</h2>
+                <span>${grouped.older.length} ${grouped.older.length === 1 ? "Property" : "Properties"}</span>
+            </div>
+        `;
+
+        const grid = document.createElement("div");
+        grid.className = "property-grid";
+
+        grouped.older.forEach(function(property) {
+            const card = createPropertyCard(property);
+            grid.appendChild(card);
+        });
+
+        section.appendChild(grid);
+        area.appendChild(section);
+
+        shownGroups++;
     }
 
-
-    const grid =
-        document.createElement(
-            "div"
-        );
-
-
-    grid.className =
-        "property-grid";
-
-
-    properties.forEach(
-        function(property) {
-
-            const card =
-                createPropertyCard(
-                    property
-                );
-
-
-            grid.appendChild(
-                card
-            );
-        }
-    );
-
-
-    area.innerHTML =
-        "";
-
-
-    area.appendChild(
-        grid
-    );
+    if (shownGroups === 0) {
+        area.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-state-icon">🏠</div>
+                <h3>No Properties Found</h3>
+                <p>Try changing your search or filters.</p>
+            </div>
+        `;
+    }
 }
 
 
@@ -5631,3 +5692,53 @@ document.addEventListener(
 </body>
 
 </html>
+<style>
+.property-date-section {
+    margin: 34px 0;
+}
+
+.property-date-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 18px;
+    padding: 14px 18px;
+    background: #ffffff;
+    border-left: 5px solid #0f766e;
+    border-radius: 14px;
+    box-shadow: 0 6px 20px rgba(15, 23, 42, 0.08);
+}
+
+.property-date-heading h2 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 800;
+    color: #0f172a;
+}
+
+.property-date-heading span {
+    font-size: 13px;
+    font-weight: 700;
+    color: #0f766e;
+    background: #ecfdf5;
+    padding: 7px 11px;
+    border-radius: 999px;
+    white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+    .property-date-heading {
+        padding: 12px 14px;
+    }
+
+    .property-date-heading h2 {
+        font-size: 18px;
+    }
+
+    .property-date-heading span {
+        font-size: 11px;
+        padding: 6px 9px;
+    }
+}
+</style>
