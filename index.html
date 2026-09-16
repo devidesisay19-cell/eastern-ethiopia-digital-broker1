@@ -1732,6 +1732,12 @@ footer {
                         Sale
                     </option>
 
+                    <option
+                        value="job"
+                        data-i18n="job"
+                    >
+                        Job
+                    </option>
                 </select>
 
             </div>
@@ -5489,6 +5495,21 @@ function applyFilters() {
             .value
             .toLowerCase();
 
+
+    if (type === "job") {
+        const propertyArea = document.getElementById("propertyArea");
+        const jobsSection = document.getElementById("jobsSection");
+
+        if (propertyArea) propertyArea.innerHTML = "";
+
+        if (jobsSection) {
+            jobsSection.style.display = "";
+            loadHomeJobs();
+            jobsSection.scrollIntoView({behavior:"smooth"});
+        }
+
+        return;
+    }
 
     const cityId =
         document
