@@ -1210,6 +1210,8 @@ button:disabled{
     background:#eef3f1;
 }
 
+
+.job-date-section{margin:28px 0 36px}.job-date-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;padding:14px 16px;border-radius:14px;background:#ecfdf5;border:1px solid #99f6e4}.job-date-heading h2{margin:0;font-size:20px}.job-date-heading span{font-size:13px;font-weight:700;padding:6px 10px;border-radius:999px;background:white}.jobs-grid-group{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px}@media(max-width:600px){.job-date-heading h2{font-size:18px}.job-date-heading{padding:12px 14px}}
 </style>
 
 </head>
@@ -4437,56 +4439,92 @@ function clearJobFilters(){
 
 function renderJobs(list){
 
-    const grid =
-        document.getElementById(
-            "jobsGrid"
-        );
-
+    const grid = document.getElementById("jobsGrid");
 
     if(!list.length){
-
-        grid.innerHTML =
-            `<div class="empty">
-
-                <div class="empty-icon">
-                    🔎
-                </div>
-
-                <strong>
-                    No jobs found
-                </strong>
-
-                <br>
-
-                Try changing your search
-                or filters.
-
-                <br><br>
-
-                <button
-                    class="
-                        btn
-                        btn-secondary
-                        btn-small
-                    "
-                    type="button"
-                    onclick="clearJobFilters()"
-                >
-                    🔄 Clear Filters
-                </button>
-
-            </div>`;
-
+        grid.innerHTML = `<div class="empty">
+            <div class="empty-icon">🔎</div>
+            <strong>No jobs found</strong>
+            <br>
+            Try changing your search or filters.
+            <br><br>
+            <button class="btn btn-secondary btn-small" type="button" onclick="clearJobFilters()">
+                🔄 Clear Filters
+            </button>
+        </div>`;
         return;
     }
 
+    const groups = {
+        today: [],
+        yesterday: [],
+        day2: [],
+        day3: [],
+        day4: [],
+        day5: [],
+        day6: [],
+        week: [],
+        older: []
+    };
 
-    grid.innerHTML =
-        list
-            .map(
-                renderJobCard
-            )
-            .join("");
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+    list.forEach(function(job){
+        const d = new Date(job.created_at);
+
+        if(isNaN(d.getTime())){
+            groups.older.push(job);
+            return;
+        }
+
+        const jobDate = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+        const diff = Math.floor((today - jobDate) / 86400000);
+
+        if(diff === 0) groups.today.push(job);
+        else if(diff === 1) groups.yesterday.push(job);
+        else if(diff === 2) groups.day2.push(job);
+        else if(diff === 3) groups.day3.push(job);
+        else if(diff === 4) groups.day4.push(job);
+        else if(diff === 5) groups.day5.push(job);
+        else if(diff === 6) groups.day6.push(job);
+        else if(diff === 7) groups.week.push(job);
+        else groups.older.push(job);
+    });
+
+    const definitions = [
+        ["today","Today Jobs"],
+        ["yesterday","Yesterday Jobs"],
+        ["day2","Before 2 Days Jobs"],
+        ["day3","Before 3 Days Jobs"],
+        ["day4","Before 4 Days Jobs"],
+        ["day5","Before 5 Days Jobs"],
+        ["day6","Before 6 Days Jobs"],
+        ["week","Before Week Jobs"],
+        ["older","Older Jobs"]
+    ];
+
+    let output = "";
+
+    definitions.forEach(function(item){
+        const jobs = groups[item[0]];
+        if(!jobs.length) return;
+
+        output += `
+            <section class="job-date-section">
+                <div class="job-date-heading">
+                    <h2>${item[1]}</h2>
+                    <span>${jobs.length} ${jobs.length === 1 ? "Job" : "Jobs"}</span>
+                </div>
+
+                <div class="jobs-grid-group">
+                    ${jobs.map(renderJobCard).join("")}
+                </div>
+            </section>
+        `;
+    });
+
+    grid.innerHTML = output;
 }
 
 
