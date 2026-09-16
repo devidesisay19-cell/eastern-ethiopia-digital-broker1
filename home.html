@@ -824,8 +824,255 @@ body {
 
 }
 
+
+/* ===== EEDB PREMIUM HOME REDESIGN ===== */
+:root{
+  --eedb-primary:#2563eb;
+  --eedb-primary-dark:#1d4ed8;
+  --eedb-accent:#06b6d4;
+  --eedb-bg:#f5f7fb;
+  --eedb-card:#ffffff;
+  --eedb-text:#0f172a;
+  --eedb-muted:#64748b;
+  --eedb-border:#e2e8f0;
+  --eedb-shadow:0 10px 30px rgba(15,23,42,.08);
+  --eedb-radius:20px;
+}
+
+html{scroll-behavior:smooth}
+
+body{
+  background:
+    radial-gradient(circle at 10% 0%,rgba(37,99,235,.08),transparent 28%),
+    radial-gradient(circle at 90% 10%,rgba(6,182,212,.07),transparent 25%),
+    var(--eedb-bg)!important;
+  color:var(--eedb-text);
+}
+
+header{
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+  box-shadow:0 4px 24px rgba(15,23,42,.06);
+}
+
+.property-card{
+  background:var(--eedb-card)!important;
+  border:1px solid rgba(226,232,240,.9)!important;
+  border-radius:var(--eedb-radius)!important;
+  overflow:hidden;
+  box-shadow:var(--eedb-shadow)!important;
+  transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease;
+}
+
+.property-card:hover{
+  transform:translateY(-6px);
+  box-shadow:0 18px 45px rgba(15,23,42,.14)!important;
+  border-color:rgba(37,99,235,.25)!important;
+}
+
+.property-card img{
+  transition:transform .45s ease;
+}
+
+.property-card:hover img{
+  transform:scale(1.045);
+}
+
+button,.btn{
+  transition:transform .2s ease,box-shadow .2s ease,background .2s ease;
+}
+
+button:hover,.btn:hover{
+  transform:translateY(-1px);
+}
+
+input,select{
+  border-radius:14px!important;
+  border:1px solid var(--eedb-border)!important;
+  background:#fff!important;
+  min-height:46px;
+  transition:border-color .2s ease,box-shadow .2s ease;
+}
+
+input:focus,select:focus{
+  outline:none!important;
+  border-color:var(--eedb-primary)!important;
+  box-shadow:0 0 0 4px rgba(37,99,235,.10)!important;
+}
+
+.property-date-group{
+  margin-top:32px;
+}
+
+.property-date-group h2{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin:0 0 18px;
+  font-size:1.25rem;
+  font-weight:800;
+  color:var(--eedb-text);
+}
+
+.property-date-group h2::before{
+  content:"";
+  width:5px;
+  height:24px;
+  border-radius:99px;
+  background:linear-gradient(180deg,var(--eedb-primary),var(--eedb-accent));
+}
+
+@media(max-width:640px){
+  .property-card{
+    border-radius:16px!important;
+  }
+
+  .property-date-group{
+    margin-top:24px;
+  }
+
+  .property-date-group h2{
+    font-size:1.08rem;
+  }
+}
+
+
+/* ===== EEDB PREMIUM V2 ===== */
+:root{
+  --eedb-blue:#2457ff; --eedb-blue2:#173dcc; --eedb-cyan:#16b8d4;
+  --eedb-ink:#101828; --eedb-muted:#667085; --eedb-line:#e7eaf0;
+  --eedb-radius:22px; --eedb-shadow:0 14px 40px rgba(16,24,40,.08);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0!important;color:var(--eedb-ink)!important;
+  background:radial-gradient(circle at 8% 0%,rgba(36,87,255,.07),transparent 24%),
+             radial-gradient(circle at 92% 8%,rgba(22,184,212,.06),transparent 22%),
+             #f7f9fc!important;
+  font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif!important;
+}
+header{
+  position:sticky!important;top:0;z-index:1000;
+  background:rgba(255,255,255,.92)!important;
+  border-bottom:1px solid rgba(231,234,240,.9)!important;
+  box-shadow:0 6px 24px rgba(16,24,40,.06)!important;
+  backdrop-filter:blur(18px)!important;-webkit-backdrop-filter:blur(18px)!important;
+}
+header img{border-radius:16px!important;box-shadow:0 7px 18px rgba(36,87,255,.18)!important}
+header button,header a{border-radius:14px!important}
+main section:first-of-type,.hero,.hero-section{border-radius:30px!important}
+.eedb-premium-hero{
+  position:relative!important;overflow:hidden!important;
+  background:radial-gradient(circle at 85% 15%,rgba(255,255,255,.20),transparent 22%),
+             radial-gradient(circle at 15% 85%,rgba(22,184,212,.24),transparent 25%),
+             linear-gradient(135deg,#1f4eea 0%,#4530d8 52%,#7b2ff0 100%)!important;
+  box-shadow:0 24px 65px rgba(50,57,180,.22)!important;
+  border:1px solid rgba(255,255,255,.20)!important;
+}
+.eedb-premium-hero::before{
+  content:"";position:absolute;width:260px;height:260px;right:-90px;top:-90px;
+  border-radius:50%;background:rgba(255,255,255,.10);
+}
+.eedb-premium-hero::after{
+  content:"";position:absolute;width:180px;height:180px;left:-70px;bottom:-85px;
+  border-radius:50%;background:rgba(255,255,255,.08);
+}
+.eedb-premium-hero>*{position:relative;z-index:2}
+.eedb-hero-badge{
+  display:inline-flex!important;align-items:center;gap:8px;margin-bottom:14px!important;
+  padding:8px 13px!important;border:1px solid rgba(255,255,255,.25)!important;
+  border-radius:999px!important;background:rgba(255,255,255,.13)!important;
+  color:#fff!important;font-size:.78rem!important;font-weight:800!important;
+  letter-spacing:.02em;backdrop-filter:blur(10px);
+}
+.eedb-hero-title{letter-spacing:-.035em!important;text-shadow:0 4px 20px rgba(0,0,0,.10)}
+.eedb-premium-search{
+  border:1px solid rgba(255,255,255,.95)!important;background:rgba(255,255,255,.96)!important;
+  box-shadow:0 18px 55px rgba(16,24,40,.12)!important;border-radius:26px!important;
+  backdrop-filter:blur(14px);
+}
+.eedb-premium-search input,.eedb-premium-search select,input,select{
+  min-height:50px!important;border:1px solid #e2e7ef!important;border-radius:15px!important;
+  background:#fff!important;color:#101828!important;box-shadow:none!important;
+}
+input::placeholder{color:#98a2b3!important}
+input:focus,select:focus{
+  outline:none!important;border-color:rgba(36,87,255,.55)!important;
+  box-shadow:0 0 0 4px rgba(36,87,255,.10)!important;
+}
+.eedb-section-heading{
+  display:flex!important;align-items:flex-end!important;justify-content:space-between!important;
+  gap:16px;margin-top:34px!important;margin-bottom:16px!important;
+}
+.eedb-section-heading h2{margin:0!important;letter-spacing:-.025em!important}
+.property-date-group{margin-top:34px!important}
+.property-date-group h2{
+  display:flex!important;align-items:center;gap:10px;margin:0 0 17px!important;
+  font-size:1.25rem!important;font-weight:900!important;letter-spacing:-.02em;
+}
+.property-date-group h2::before{
+  content:"";width:5px;height:25px;border-radius:99px;
+  background:linear-gradient(180deg,var(--eedb-blue),var(--eedb-cyan));
+}
+.property-card{
+  position:relative!important;overflow:hidden!important;border:1px solid #e7eaf0!important;
+  border-radius:20px!important;background:#fff!important;
+  box-shadow:0 8px 25px rgba(16,24,40,.06)!important;
+  transition:transform .24s ease,box-shadow .24s ease,border-color .24s ease!important;
+}
+.property-card:hover{
+  transform:translateY(-6px)!important;border-color:rgba(36,87,255,.22)!important;
+  box-shadow:0 20px 44px rgba(16,24,40,.12)!important;
+}
+.property-card img{display:block;width:100%;object-fit:cover;transition:transform .45s ease}
+.property-card:hover img{transform:scale(1.045)}
+button,.btn,a[role="button"]{transition:transform .18s ease,box-shadow .18s ease,background .18s ease!important}
+button:hover,.btn:hover,a[role="button"]:hover{transform:translateY(-2px)}
+.eedb-trust-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:18px 0 8px}
+.eedb-trust-item{
+  display:flex;align-items:center;gap:10px;min-height:62px;padding:13px 15px;
+  border:1px solid #e8ebf1;border-radius:17px;background:rgba(255,255,255,.84);
+  box-shadow:0 7px 22px rgba(16,24,40,.05);
+}
+.eedb-trust-icon{
+  width:38px;height:38px;display:grid;place-items:center;flex:0 0 38px;
+  border-radius:12px;background:linear-gradient(135deg,#eaf0ff,#eefcff);font-size:18px;
+}
+.eedb-trust-item strong{display:block;font-size:.9rem;line-height:1.15}
+.eedb-trust-item span{display:block;margin-top:3px;color:var(--eedb-muted);font-size:.74rem}
+@media(max-width:700px){
+  .eedb-premium-hero{border-radius:24px!important}
+  .eedb-premium-search{border-radius:22px!important}
+  .eedb-trust-row{grid-template-columns:1fr}
+  .eedb-section-heading{margin-top:27px!important}
+  .property-card{border-radius:18px!important}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{scroll-behavior:auto!important;transition:none!important}
+}
+
 </style>
 
+<style>
+/* ===== EEDB CLEAN PREMIUM HOME ===== */
+body{background:#f4f8f7!important;color:#102a2a!important}
+.hero,.hero-section{background:linear-gradient(135deg,#0f766e 0%,#115e59 58%,#164e63 100%)!important;border-radius:0 0 28px 28px!important;box-shadow:0 16px 42px rgba(15,118,110,.18)!important;overflow:hidden!important}
+.hero h1,.hero-section h1{color:#fff!important;font-weight:900!important;letter-spacing:-1.2px!important;line-height:1.06!important}
+.hero p,.hero-section p{color:rgba(255,255,255,.9)!important;line-height:1.55!important}
+.search-container,.search-card,.search-box,.filters,.filter-card{background:#fff!important;border-radius:22px!important;border:1px solid rgba(15,118,110,.10)!important;box-shadow:0 12px 34px rgba(15,23,42,.08)!important}
+input,select{border-radius:15px!important;border:1px solid #dce7e5!important;min-height:52px!important}
+.property-card,.property,.card{background:#fff!important;border-radius:20px!important;border:1px solid rgba(15,23,42,.07)!important;box-shadow:0 8px 24px rgba(15,23,42,.07)!important;overflow:hidden!important}
+.property-card:hover,.property:hover,.card:hover{transform:translateY(-4px)!important;box-shadow:0 15px 34px rgba(15,23,42,.12)!important}
+.property-card img,.property img,.card img{aspect-ratio:16/10!important;object-fit:cover!important}
+@media(max-width:700px){
+ .hero,.hero-section{margin-left:-14px!important;margin-right:-14px!important;padding:38px 22px 42px!important}
+ .hero h1,.hero-section h1{font-size:38px!important}
+ .hero p,.hero-section p{font-size:16px!important}
+ .search-container,.search-card,.search-box,.filters,.filter-card{border-radius:20px!important}
+ .property-grid,.properties-grid,.cards-grid{grid-template-columns:1fr!important}
+}
+</style>
 </head>
 
 
@@ -2334,6 +2581,74 @@ else {
 </script>
 
 
+
+<script>
+(function(){
+  function decorateHome(){
+    try{
+      const headings=Array.from(document.querySelectorAll("h1,h2,h3"));
+      const heroTitle=headings.find(el=>(el.textContent||"").toLowerCase().includes("find your perfect property"));
+      if(heroTitle){
+        heroTitle.classList.add("eedb-hero-title");
+        const hero=heroTitle.closest("section")||heroTitle.parentElement;
+        if(hero){
+          hero.classList.add("eedb-premium-hero");
+          if(!hero.querySelector(".eedb-hero-badge")){
+            const badge=document.createElement("div");
+            badge.className="eedb-hero-badge";
+            badge.textContent="🏠 Eastern Ethiopia • Property Marketplace";
+            hero.insertBefore(badge,heroTitle);
+          }
+        }
+      }
+      const inputs=Array.from(document.querySelectorAll("input,select"));
+      const searchInput=inputs.find(el=>((el.placeholder||"")+" "+(el.getAttribute("aria-label")||"")).toLowerCase().includes("search"));
+      if(searchInput){
+        const panel=searchInput.closest("form")||searchInput.closest("section")||searchInput.parentElement;
+        if(panel) panel.classList.add("eedb-premium-search");
+      }
+      const featured=headings.find(el=>(el.textContent||"").toLowerCase().includes("featured properties"));
+      if(featured&&featured.parentElement) featured.parentElement.classList.add("eedb-section-heading");
+      const available=headings.find(el=>(el.textContent||"").toLowerCase().includes("available properties"));
+      if(available&&available.parentElement){
+        available.parentElement.classList.add("eedb-section-heading");
+        if(!document.querySelector(".eedb-trust-row")){
+          const row=document.createElement("div");
+          row.className="eedb-trust-row";
+          row.innerHTML=
+            '<div class="eedb-trust-item"><div class="eedb-trust-icon">✓</div><div><strong>Reviewed listings</strong><span>Published properties are checked</span></div></div>'+
+            '<div class="eedb-trust-item"><div class="eedb-trust-icon">📍</div><div><strong>Eastern Ethiopia</strong><span>Search by town and area</span></div></div>'+
+            '<div class="eedb-trust-item"><div class="eedb-trust-icon">⚡</div><div><strong>Fast discovery</strong><span>Find rent and sale listings</span></div></div>';
+          available.parentElement.after(row);
+        }
+      }
+    }catch(e){console.warn("EEDB premium:",e)}
+  }
+  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",decorateHome);
+  else decorateHome();
+  setTimeout(decorateHome,1200);
+  setTimeout(decorateHome,3000);
+})();
+</script>
+
+<script>
+/* ===== EEDB ONE HERO BADGE ===== */
+(function(){
+ const hero=document.querySelector('.hero')||document.querySelector('.hero-section');
+ if(!hero)return;
+ hero.querySelectorAll('.eedb-v3-badge,.eedb-final-badge').forEach(x=>x.remove());
+ const old=[...hero.querySelectorAll('div')].filter(x=>(x.textContent||'').trim()==='🏠 Eastern Ethiopia • Property Marketplace');
+ old.forEach(x=>x.remove());
+ if(!hero.querySelector('.eedb-clean-badge')){
+   const h=hero.querySelector('h1');
+   const b=document.createElement('div');
+   b.className='eedb-clean-badge';
+   b.textContent='🏠 Eastern Ethiopia • Trusted Property Marketplace';
+   b.style.cssText='display:inline-flex;align-items:center;padding:9px 15px;margin-bottom:18px;border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.12);border-radius:999px;color:#fff;font-weight:800;font-size:13px;backdrop-filter:blur(10px)';
+   if(h)h.parentNode.insertBefore(b,h);else hero.prepend(b);
+ }
+})();
+</script>
 </body>
 
 </html>
