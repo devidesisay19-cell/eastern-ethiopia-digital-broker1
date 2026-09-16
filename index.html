@@ -1840,8 +1840,6 @@ footer {
 </main>
 
 
-     LOGIN MODAL
-========================================================= -->
 
 <div
     class="modal"
@@ -4572,6 +4570,160 @@ async function loadProperties() {
 /* =========================================================
    PROPERTY IMAGE URL
 ========================================================= */
+/* =========================================================
+   LOAD HOME JOBS
+========================================================= */
+
+async function loadHomeJobs() {
+    const area = document.getElementById("homeJobsArea");
+    if (!area || !db) return;
+
+    try {
+        const { data, error } = await db
+            .from("jobs")
+            .select("id,title,description,category,job_type,salary,company_name,application_deadline,status,created_at")
+            .eq("status","published")
+            .order("created_at",{ascending:false});
+
+        if (error) throw error;
+
+        renderHomeJobs(data || []);
+    } catch (error) {
+        console.error("HOME JOB LOAD ERROR:", error);
+        area.innerHTML = '<div class="error-box">HOME JOB ERROR: ' + String(error.message || error) + '</div>';
+    }
+}
+
+function renderHomeJobs(list) {
+    const area = document.getElementById("homeJobsArea");
+    if (!area) return;
+
+    if (!list.length) {
+        area.innerHTML = '<div class="empty">No published jobs found.</div>';
+        return;
+    }
+
+    const groups = {
+        today:[],
+        yesterday:[],
+        day2:[],
+        day3:[],
+        day4:[],
+        day5:[],
+        day6:[],
+        week:[],
+        older:[]
+    };
+
+    const now = new Date();
+    const today = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate()
+    );
+
+    list.forEach(function(job) {
+        const d = new Date(job.created_at);
+
+        if (isNaN(d.getTime())) {
+            groups.older.push(job);
+            return;
+        }
+
+        const jobDate = new Date(
+            d.getFullYear(),
+            d.getMonth(),
+            d.getDate()
+        );
+
+        const diff = Math.floor(
+            (today - jobDate) / 86400000
+        );
+
+        if (diff === 0) groups.today.push(job);
+        else if (diff === 1) groups.yesterday.push(job);
+        else if (diff === 2) groups.day2.push(job);
+        else if (diff === 3) groups.day3.push(job);
+        else if (diff === 4) groups.day4.push(job);
+        else if (diff === 5) groups.day5.push(job);
+        else if (diff === 6) groups.day6.push(job);
+        else if (diff === 7) groups.week.push(job);
+        else groups.older.push(job);
+    });
+
+    const names = [
+        ["today","Today Jobs"],
+        ["yesterday","Yesterday Jobs"],
+        ["day2","Before 2 Days Jobs"],
+        ["day3","Before 3 Days Jobs"],
+        ["day4","Before 4 Days Jobs"],
+        ["day5","Before 5 Days Jobs"],
+        ["day6","Before 6 Days Jobs"],
+        ["week","Before Week Jobs"],
+        ["older","Older Jobs"]
+    ];
+
+    let html = "";
+
+    names.forEach(function(item) {
+        const jobs = groups[item[0]];
+
+        if (!jobs.length) return;
+
+        html += `
+            <section class="home-job-date-section">
+                <div class="home-job-date-heading">
+                    <h3>${item[1]}</h3>
+                    <span>
+                        ${jobs.length}
+                        ${jobs.length === 1 ? "Job" : "Jobs"}
+                    </span>
+                </div>
+
+                <div class="home-jobs-grid">
+                    ${jobs.map(function(job) {
+                        return `
+                            <article class="home-job-card">
+                                <h3>
+                                    ${escapeHTML(job.title || "Untitled Job")}
+                                </h3>
+
+                                <strong>
+                                    ${escapeHTML(job.company_name || "Company")}
+                                </strong>
+
+                                <p>
+                                    ${escapeHTML(
+                                        job.description ||
+                                        "No description available."
+                                    )}
+                                </p>
+
+                                <div>
+                                    ${escapeHTML(job.category || "")}
+                                </div>
+
+                                <div>
+                                    ${escapeHTML(job.job_type || "")}
+                                </div>
+
+                                ${
+                                    job.salary
+                                    ? `<div>${escapeHTML(
+                                        String(job.salary)
+                                      )}</div>`
+                                    : ""
+                                }
+                            </article>
+                        `;
+                    }).join("")}
+                </div>
+            </section>
+        `;
+    });
+
+    area.innerHTML = html;
+}
 
 function getPropertyImage(
     property
@@ -5786,7 +5938,4 @@ document.addEventListener(
         padding: 6px 9px;
     }
 }
-.quick-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin:28px 0;}
-.quick-action-card{display:block;text-decoration:none;}
-@media(max-width:600px){.quick-actions{grid-template-columns:1fr;}}
 </style>
