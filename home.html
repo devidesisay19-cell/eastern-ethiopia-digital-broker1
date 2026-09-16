@@ -1566,67 +1566,114 @@ function getFilteredProperties() {
 
 function renderProperties() {
 
-    const properties =
-        getFilteredProperties();
-
+    const properties = getFilteredProperties();
 
     resultCount.textContent =
         properties.length +
-        (
-            properties.length === 1
-                ? " property"
-                : " properties"
-        ) +
+        (properties.length === 1 ? " property" : " properties") +
         " available";
 
-
-    if (
-        properties.length === 0
-    ) {
-
-        propertiesList.innerHTML =
-
-            `
+    if (properties.length === 0) {
+        propertiesList.innerHTML = `
             <div class="empty-state">
-
-                <div class="empty-icon">
-                    🔎
-                </div>
-
-                <h3>
-                    No matching properties
-                </h3>
-
-                <p>
-                    Try changing your search or filters.
-                </p>
-
+                <div class="empty-icon">🔎</div>
+                <h3>No matching properties</h3>
+                <p>Try changing your search or filters.</p>
             </div>
-            `;
-
+        `;
         return;
-
     }
 
+    const groups = new Map();
 
-    propertiesList.innerHTML =
-        "";
+    properties.forEach(property => {
 
+        if (!property.created_at) return;
 
-    properties.forEach(
-        property => {
+        const created = new Date(property.created_at);
 
-            propertiesList.appendChild(
-                createPropertyCard(
-                    property
-                )
-            );
+        if (Number.isNaN(created.getTime())) return;
 
+        const now = new Date();
+
+        const todayStart = new Date(
+            now.getFullYear(),
+            now.getMonth(),
+            now.getDate()
+        );
+
+        const createdStart = new Date(
+            created.getFullYear(),
+            created.getMonth(),
+            created.getDate()
+        );
+
+        const diffDays = Math.floor(
+            (todayStart.getTime() - createdStart.getTime()) / 86400000
+        );
+
+        let age;
+
+        if (diffDays <= 0) {
+            age = "Today";
+        } else if (diffDays === 1) {
+            age = "Yesterday";
+        } else if (diffDays >= 2 && diffDays <= 6) {
+            age = "Before " + diffDays + " days";
+        } else {
+            age = "Before week";
         }
-    );
 
+        if (!groups.has(age)) {
+            groups.set(age, []);
+        }
+
+        groups.get(age).push(property);
+    });
+
+    const order = [
+        "Today",
+        "Yesterday",
+        "Before 2 days",
+        "Before 3 days",
+        "Before 4 days",
+        "Before 5 days",
+        "Before 6 days",
+        "Before week"
+    ];
+
+    propertiesList.innerHTML = "";
+
+    order.forEach(age => {
+
+        const list = groups.get(age);
+
+        if (!list || !list.length) return;
+
+        const section = document.createElement("section");
+        section.className = "property-date-group";
+
+        const title = document.createElement("div");
+        title.className = "section-header";
+
+        title.innerHTML =
+            '<h2 class="section-title">📅 ' +
+            age +
+            ' Properties</h2>';
+
+        const grid = document.createElement("div");
+        grid.className = "properties-grid";
+
+        list.forEach(property => {
+            grid.appendChild(createPropertyCard(property));
+        });
+
+        section.appendChild(title);
+        section.appendChild(grid);
+
+        propertiesList.appendChild(section);
+    });
 }
-
 
 /* =====================================================
    CREATE CARD
